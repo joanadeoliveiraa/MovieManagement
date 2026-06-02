@@ -4,7 +4,11 @@ using System.Text;
 
 namespace MovieManagement.Domain.Entities
 {
-    internal class Categoria
+    public class Categoria
     {
+        public int Id { get; set; }
+        // Nome da categoria (Ação, Comédia, Drama...)
+        public string Nome { get; set; }
+
     }
 }
