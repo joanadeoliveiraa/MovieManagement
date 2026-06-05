@@ -4,18 +4,26 @@ using MovieManagement.Domain.Entities;
 using MovieManagement.Domain.Enums;
 using MovieManagement.Domain.Interfaces;
 
-//Filmes:
-FilmeRepository repository = new();
-FilmeServices service = new(repository);
+// ======================================================
+// CONFIGURAÇÃO INICIAL
+// ======================================================
 
-//Categorias:
+// FILMES
+FilmeRepository filmeRepository = new();
+FilmeServices filmeService = new(filmeRepository);
+
+// CATEGORIAS
 CategoriaRepository categoriaRepository = new();
 CategoriaService categoriaService = new(categoriaRepository);
 
-//Realizadores:
+// REALIZADORES
 RealizadorRepository realizadorRepository = new();
 RealizadorService realizadorService = new(realizadorRepository);
 
+
+// ======================================================
+// MENU PRINCIPAL
+// ======================================================
 
 bool sair = false;
 
@@ -108,18 +116,25 @@ while (!sair)
     }
 }
 
+// ======================================================
+// MÉTODOS DE FILMES
+// ======================================================
+
 void AdicionarFilme()
 {
     try
     {
         Console.Clear();
-
         Console.WriteLine("=== ADICIONAR FILME ===");
+
+        // =========================
+        // VALIDAÇÕES INICIAIS
+        // =========================
 
         Console.Write("Título: ");
         string? titulo = Console.ReadLine();
 
-        // Regra 1 - Título obrigatório.
+        //Regra 1 - Título obrigatório.
         //Adicionei condição para não permitir avançar com campo vazio.
         if (string.IsNullOrWhiteSpace(titulo))
         {
@@ -128,21 +143,40 @@ void AdicionarFilme()
             return;
         }
 
-        // Regra 2 - Não permitir títulos duplicados
+        // Tem de existir pelo menos uma categoria
+        if (categoriaService.ObterTodos().Count == 0)
+        {
+            Console.WriteLine("Não existem categorias registadas.");
+
+            Console.WriteLine("Crie uma categoria antes de adicionar filmes.");
+
+            Console.ReadKey();
+            return;
+        }
+
+        //Regra 2 - Não permitir títulos duplicados
         //Desta forma, no caso de inserirmos um filme que já exista na lista, aparece logo o erro "Titulo inválido" sem pedir os restantes dados do menu.
         //Sem termos que introduzir os dados até ao fim.
-        if (service.Procurar(titulo) != null)
+        if (filmeService.Procurar(titulo) != null)
         {
             Console.WriteLine("\nTítulo inválido. Já existe um filme com esse título.");
             Console.ReadKey();
             return;
         }
 
+        // =========================
+        // DADOS DO FILME
+        // =========================
+
         Console.Write("Ano: ");
         int ano = int.Parse(Console.ReadLine()!);
 
         Console.Write("Língua: ");
         string? lingua = Console.ReadLine();
+
+        // =========================
+        // CLASSIFICAÇÃO
+        // =========================
 
         Console.WriteLine("\nClassificação:");
 
@@ -163,7 +197,7 @@ void AdicionarFilme()
             Classificacao = classificacaoEscolhida
         };
 
-        service.Adicionar(filme);
+        filmeService.Adicionar(filme);
 
         Console.WriteLine("\nFilme adicionado com sucesso.");
     }
@@ -181,7 +215,7 @@ void ListarFilmes()
 
     Console.WriteLine("=== LISTA DE FILMES ===\n");
 
-    List<Filme> filmes = service.ObterTodos();
+    List<Filme> filmes = filmeService.ObterTodos();
 
     if (filmes.Count == 0)
     {
@@ -194,22 +228,16 @@ void ListarFilmes()
             Console.WriteLine($"Id: {filme.Id} | " + $"Título: {filme.Titulo} | " + $"Ano: {filme.Ano} | " + $"Língua: {filme.Lingua} | " + $"Classificação: {filme.Classificacao}");
         }
     }
-
     Console.ReadKey();
 }
 
 void ProcurarFilme()
 {
     Console.Clear();
-
     Console.WriteLine("=== PROCURAR FILME ===");
-
     Console.Write("Título: ");
-
     string? titulo = Console.ReadLine();
-
-    Filme? filme = service.Procurar(titulo!);
-
+    Filme? filme = filmeService.Procurar(titulo!);
     if (filme == null)
     {
         Console.WriteLine("\nFilme não encontrado.");
@@ -217,24 +245,17 @@ void ProcurarFilme()
     else
     {
         Console.WriteLine("\nFilme encontrado:");
-
         Console.WriteLine($"Id: {filme.Id}\n" + $"Título: {filme.Titulo}\n" + $"Ano: {filme.Ano}\n" + $"Língua: {filme.Lingua}\n" + $"Classificação: {filme.Classificacao}");
     }
-
-    Console.ReadKey();
-}
+    Console.ReadKey();}
 
 void RemoverFilme()
 {
     Console.Clear();
-
     Console.WriteLine("=== REMOVER FILME ===");
-
     Console.Write("Id do filme: ");
-
     int id = int.Parse(Console.ReadLine()!);
-
-    bool removido = service.Remover(id);
+    bool removido = filmeService.Remover(id);
 
     if (removido)
     {
@@ -244,9 +265,13 @@ void RemoverFilme()
     {
         Console.WriteLine("\nFilme não encontrado.");
     }
-
     Console.ReadKey();
 }
+
+
+// ======================================================
+// MÉTODOS DE CATEGORIAS
+// ======================================================
 
 void AdicionarCategoria()
 {
@@ -355,6 +380,10 @@ void RemoverCategoria()
     Console.ReadKey();
 }
 
+// ======================================================
+// MÉTODOS DE REALIZADORES
+// ======================================================
+
 void AdicionarRealizador()
 {
     try
@@ -364,16 +393,16 @@ void AdicionarRealizador()
         Console.Write("Nome: ");
         string? nome = Console.ReadLine();
 
-        // Nome obrigatório. 
-        if (string.IsNullOrWhiteSpace(nome))
+        // Regra 1 - Nome obrigatório
+        if (string.IsNullOrWhiteSpace(nome)) // Nome obrigatório.
         {
             Console.WriteLine("\nO nome do realizador é obrigatório.");
             Console.ReadKey();
             return;
         }
 
-        // Não permitir realizadores duplicados
-        if (realizadorService.Procurar(nome) != null)
+        // Regra 2 - Não permitir realizadores duplicados
+        if (realizadorService.Procurar(nome) != null) // Não permitir realizadores duplicados
         {
             Console.WriteLine("\nJá existe um realizador com esse nome.");
             Console.ReadKey();

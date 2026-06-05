@@ -46,5 +46,20 @@ namespace MovieManagement.Business.Services
         {
             return _repository.Remover(id);
         }
+
+
+        
+        public Realizador? ProcurarPorId(int id) // Procura realizador pelo Id
+        {
+            foreach (Realizador realizador in _repository.ObterTodos())
+            {
+                if (realizador.Id == id)
+                {
+                    return realizador;
+                }
+            }
+
+            return null;
+        }
     }
 }

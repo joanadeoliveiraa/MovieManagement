@@ -46,5 +46,20 @@ namespace MovieManagement.Business.Services
         {
             return _repository.Remover(id);
         }
+
+
+        
+        public Categoria? ProcurarPorId(int id) // Procura categoria pelo ID
+        {
+            foreach (Categoria categoria in _repository.ObterTodos())
+            {
+                if (categoria.Id == id)
+                {
+                    return categoria;
+                }
+            }
+
+            return null;
+        }
     }
 }

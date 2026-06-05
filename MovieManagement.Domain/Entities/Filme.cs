@@ -13,5 +13,9 @@ namespace MovieManagement.Domain.Entities
         public string Lingua { get; set; }
         public ClassificacaoFilme Classificacao { get; set; } // ENUMS!
 
+        public Categoria Categoria { get; set; } // Relação com Categoria, cada filme pertence a uma categoria
+
+        public Realizador Realizador { get; set; } // Relação com Realizador, cada filme possui um realizador
+
     }
 }
