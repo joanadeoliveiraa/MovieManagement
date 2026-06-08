@@ -20,11 +20,11 @@ O projeto está organizado nas seguintes camadas:
 
 ```text
 MovieManagement
-
-├─ MovieManagement.UI
-├─ MovieManagement.Business
-├─ MovieManagement.Data
-└─ MovieManagement.Domain
+│
+├── MovieManagement.UI
+├── MovieManagement.Business
+├── MovieManagement.Data
+└── MovieManagement.Domain
 ```
 
 ### Responsabilidades
@@ -87,6 +87,7 @@ public enum ClassificacaoFilme
 
 - C#
 - .NET
+- SQLite
 - Visual Studio
 - Git
 - GitHub
@@ -147,16 +148,68 @@ Foi mantida a arquitetura em camadas utilizada em todo o projeto:
   
 ---
 
+## Parte 3 – Relacionamentos e Persistência SQLite
+
+### Relacionamentos Implementados
+
+Foram implementados relacionamentos entre as entidades do sistema:
+
+* Cada Filme pertence a uma Categoria
+* Cada Filme possui um Realizador
+
+Durante a criação de um filme é possível selecionar a categoria e o realizador a partir dos registos existentes.
+
+### Persistência SQLite
+
+A aplicação utiliza SQLite como mecanismo de persistência de dados, permitindo manter categorias, realizadores e filmes registados entre execuções da aplicação.
+
+Funcionalidades implementadas:
+
+* Criação automática da base de dados `MovieManagement.db`
+* Criação automática das tabelas:
+
+  * Categorias
+  * Realizadores
+  * Filmes
+* Implementação de repositories SQLite para todas as entidades
+* Persistência permanente dos dados após encerramento da aplicação
+
+
+### Funcionalidades Disponíveis
+
+#### Filmes
+
+* Adicionar filme
+* Listar filmes
+* Procurar filme
+* Remover filme
+
+#### Categorias
+
+* Adicionar categoria
+* Listar categorias
+* Procurar categoria
+* Remover categoria
+
+#### Realizadores
+
+* Adicionar realizador
+* Listar realizadores
+* Procurar realizador
+* Remover realizador
+
+
+---
+
 ## Estado Atual do Projeto
 
 ### Concluído
 
 - Parte 1 – Gestão de Filmes
 - Parte 2 – Gestão de Categorias e Realizadores
-
-### Próximas funcionalidades
-
 - Parte 3 – Relacionamentos entre entidades e persistência SQLite
+
+O projeto encontra-se funcional e cumpre os requisitos das três partes do enunciado.
   
 
 ## Autor
