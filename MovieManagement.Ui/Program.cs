@@ -10,18 +10,17 @@ using MovieManagement.Data.Database;
 // CONFIGURAÇÃO INICIAL
 // ======================================================
 
-// FILMES
-FilmeRepository filmeRepository = new();
-FilmeServices filmeService = new(filmeRepository);
+    // FILMES
+    IFilmeRepository filmeRepository = new FilmeSQLiteRepository();
+    FilmeServices filmeService = new(filmeRepository);
 
-// CATEGORIAS
-ICategoriaRepository categoriaRepository = new CategoriaSQLiteRepository();
-CategoriaService categoriaService = new(categoriaRepository);
+    // CATEGORIAS
+    ICategoriaRepository categoriaRepository = new CategoriaSQLiteRepository();
+    CategoriaService categoriaService = new(categoriaRepository);
 
-// REALIZADORES
-IRealizadorRepository realizadorRepository = new RealizadorSQLiteRepository();
-RealizadorService realizadorService = new(realizadorRepository);
-
+    // REALIZADORES
+    IRealizadorRepository realizadorRepository = new RealizadorSQLiteRepository();
+    RealizadorService realizadorService = new(realizadorRepository);
 
 // ======================================================
 // MENU PRINCIPAL
