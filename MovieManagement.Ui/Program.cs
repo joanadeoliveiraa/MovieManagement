@@ -3,6 +3,8 @@ using MovieManagement.Data.Repositories;
 using MovieManagement.Domain.Entities;
 using MovieManagement.Domain.Enums;
 using MovieManagement.Domain.Interfaces;
+using MovieManagement.Data.Database;
+
 
 // ======================================================
 // CONFIGURAÇÃO INICIAL
@@ -13,23 +15,25 @@ FilmeRepository filmeRepository = new();
 FilmeServices filmeService = new(filmeRepository);
 
 // CATEGORIAS
-CategoriaRepository categoriaRepository = new();
+ICategoriaRepository categoriaRepository = new CategoriaSQLiteRepository();
 CategoriaService categoriaService = new(categoriaRepository);
 
 // REALIZADORES
-RealizadorRepository realizadorRepository = new();
+IRealizadorRepository realizadorRepository = new RealizadorSQLiteRepository();
 RealizadorService realizadorService = new(realizadorRepository);
 
 
 // ======================================================
 // MENU PRINCIPAL
 // ======================================================
+DatabaseInitializer.Initialize();
 
 bool sair = false;
 
 while (!sair)
 {
     Console.Clear();
+    Console.WriteLine("Base de dados criada com sucesso."); //Teste
 
     Console.WriteLine("=== MOVIE MANAGEMENT ===");
     Console.WriteLine("1 - Adicionar Filme");
@@ -154,6 +158,17 @@ void AdicionarFilme()
             return;
         }
 
+        // Tem de existir pelo menos um realizador
+        if (realizadorService.ObterTodos().Count == 0)
+        {
+            Console.WriteLine("\nNão existem realizadores registados.");
+
+            Console.WriteLine("Crie um realizador antes de adicionar filmes.");
+
+            Console.ReadKey();
+            return;
+        }
+
         //Regra 2 - Não permitir títulos duplicados
         //Desta forma, no caso de inserirmos um filme que já exista na lista, aparece logo o erro "Titulo inválido" sem pedir os restantes dados do menu.
         //Sem termos que introduzir os dados até ao fim.
@@ -189,12 +204,65 @@ void AdicionarFilme()
 
         ClassificacaoFilme classificacaoEscolhida = (ClassificacaoFilme)int.Parse(Console.ReadLine()!);
 
+        // =========================
+        // ESCOLHER CATEGORIA
+        // =========================
+
+        Console.WriteLine("\n=== CATEGORIAS DISPONÍVEIS ===");
+
+        foreach (Categoria categoria in categoriaService.ObterTodos())
+        {
+            Console.WriteLine(
+                $"{categoria.Id} - {categoria.Nome}");
+        }
+
+        Console.Write("\nId da categoria: ");
+
+        int categoriaId = int.Parse(Console.ReadLine()!);
+
+        Categoria? categoriaSelecionada = categoriaService.ProcurarPorId(categoriaId);
+
+        if (categoriaSelecionada == null)
+        {
+            Console.WriteLine("\nCategoria inválida.");
+            Console.ReadKey();
+            return;
+        }
+
+        // =========================
+        // ESCOLHER REALIZADOR
+        // =========================
+
+        Console.WriteLine("\n=== REALIZADORES DISPONÍVEIS ===");
+
+        foreach (Realizador realizador in realizadorService.ObterTodos())
+        {
+            Console.WriteLine(
+                $"{realizador.Id} - {realizador.Nome}");
+        }
+
+        Console.Write("\nId do realizador: ");
+
+        int realizadorId = int.Parse(Console.ReadLine()!);
+
+        Realizador? realizadorSelecionado = realizadorService.ProcurarPorId(realizadorId);
+
+        if (realizadorSelecionado == null)
+        {
+            Console.WriteLine("\nRealizador inválido.");
+            Console.ReadKey();
+            return;
+        }
+
         Filme filme = new()
         {
             Titulo = titulo!,
             Ano = ano,
             Lingua = lingua!,
-            Classificacao = classificacaoEscolhida
+            Classificacao = classificacaoEscolhida,
+            //Nova info. Parte 3
+            Categoria = categoriaSelecionada,
+            Realizador = realizadorSelecionado
         };
 
         filmeService.Adicionar(filme);
@@ -212,7 +280,6 @@ void AdicionarFilme()
 void ListarFilmes()
 {
     Console.Clear();
-
     Console.WriteLine("=== LISTA DE FILMES ===\n");
 
     List<Filme> filmes = filmeService.ObterTodos();
@@ -225,7 +292,13 @@ void ListarFilmes()
     {
         foreach (Filme filme in filmes)
         {
-            Console.WriteLine($"Id: {filme.Id} | " + $"Título: {filme.Titulo} | " + $"Ano: {filme.Ano} | " + $"Língua: {filme.Lingua} | " + $"Classificação: {filme.Classificacao}");
+         Console.WriteLine($"Id: {filme.Id}\n" +
+         $"Título: {filme.Titulo}\n" +
+         $"Ano: {filme.Ano}\n" +
+         $"Língua: {filme.Lingua}\n" +
+         $"Classificação: {filme.Classificacao}\n" +
+         $"Categoria: {filme.Categoria.Nome}\n" +
+         $"Realizador: {filme.Realizador.Nome}\n");
         }
     }
     Console.ReadKey();
@@ -245,9 +318,16 @@ void ProcurarFilme()
     else
     {
         Console.WriteLine("\nFilme encontrado:");
-        Console.WriteLine($"Id: {filme.Id}\n" + $"Título: {filme.Titulo}\n" + $"Ano: {filme.Ano}\n" + $"Língua: {filme.Lingua}\n" + $"Classificação: {filme.Classificacao}");
+        Console.WriteLine($"Id: {filme.Id}\n" + 
+            $"Título: {filme.Titulo}\n" + 
+            $"Ano: {filme.Ano}\n" + 
+            $"Língua: {filme.Lingua}\n" + 
+            $"Classificação: {filme.Classificacao}\n" + 
+            $"Categoria: {filme.Categoria.Nome}\n" + 
+            $"Realizador: {filme.Realizador.Nome}");
     }
-    Console.ReadKey();}
+    Console.ReadKey();
+}
 
 void RemoverFilme()
 {
@@ -433,6 +513,7 @@ void ListarRealizadores()
 {
     Console.Clear();
     Console.WriteLine("=== LISTA DE REALIZADORES ===\n");
+
     List<Realizador> realizadores = realizadorService.ObterTodos();
 
     if (realizadores.Count == 0)
